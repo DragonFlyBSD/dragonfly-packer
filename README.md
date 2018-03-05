@@ -10,8 +10,9 @@ Please bear in mind that this repo contains scripts and templates specific to ou
 
 This templates are loosely in the work from other people:
 
-[b00ga's templates](https://github.com/b00ga/packer-templates)
-[brd's templates for FreeBSD](https://github.com/brd/packer-freebsd)
-[boxcutter's templates](https://github.com/boxcutter/bsd)
+- [b00ga's templates](https://github.com/b00ga/packer-templates)
+- [brd's templates for FreeBSD](https://github.com/brd/packer-freebsd)
+- [boxcutter's templates](https://github.com/boxcutter/bsd)
+
 
 Probably somebody else's ...
