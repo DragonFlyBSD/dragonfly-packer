@@ -1,0 +1,35 @@
+{
+    "builders": [
+	{
+	    "type": "qemu",
+	    "vnc_port_min": "5920",
+	    "vnc_port_max": "5922",
+	    "headless": "true",
+	    "iso_url": "http://avalon.dragonflybsd.org/iso-images/dfly-x86_64-5.0.2_REL.iso",
+	    "iso_checksum": "717cb73f87a85396bbb1aa55e30048a6",
+	    "iso_checksum_type": "md5",
+	    "iso_target_path": "/data/packer/cache",
+	    "boot_wait": "5s",
+	    "boot_command": [
+		"1<wait10><wait10><wait10>",
+		"installer<enter><wait5>",
+		"<enter>,<wait>",
+		"<enter>,<wait>",
+		"<right>,<enter><wait>",
+		"<enter><wait><enter><wait>",
+		"<enter><wait><enter><wait>",
+		"<right><right><enter><wait>",
+		"<down><down><down><down><enter><wait>",
+		"<enter><wait>",
+		"<wait10><wait10><wait10><wait10><wait10><wait10>",
+		"<wait10><wait10><wait10><wait10><wait10><wait10>",
+		"<wait10><wait10><wait10><wait10><wait10><wait10>"
+	    ],
+	    "shutdown_command": "poweroff",
+	    "ssh_username": "root",
+	    "net_device": "e1000",
+	    "disk_interface": "virtio",
+	    "format": "qcow2"
+	}
+    ]
+}

@@ -1,0 +1,68 @@
+{
+    "builders": [
+	{
+	    "type": "qemu",
+	    "headless": "true",
+	    "vnc_bind_address": "0.0.0.0",
+	    "http_directory": "http",
+	    "iso_url": "http://avalon.dragonflybsd.org/iso-images/dfly-x86_64-5.0.2_REL.iso",
+	    "iso_checksum": "717cb73f87a85396bbb1aa55e30048a6",
+	    "iso_checksum_type": "md5",
+	    "boot_wait": "5s",
+	    "boot_command": [
+		"1<wait10><wait10><wait10><wait10><wait10><wait10>",
+		"root<enter><wait5>",
+		"/sbin/dhclient vtnet0<enter><wait10>",
+		"/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/dfly502_ufs_legacy.sh<enter>",
+		"/bin/sh /tmp/install && shutdown -r now<enter>"
+	    ],
+	    "vm_name": "dragonfly502",
+	    "shutdown_command": "/sbin/poweroff",
+	    "ssh_username": "vagrant",
+	    "ssh_password": "vagrant",
+	    "ssh_wait_timeout": "1800s",
+	    "disk_size": 10000,
+	    "format": "qcow2"
+	},
+	{
+	    "type": "virtualbox-iso",
+	    "guest_os_type": "FreeBSD_64",
+	    "vm_name": "dfly502",
+	    "headless": "true",
+	    "http_directory": "http",
+	    "iso_url": "http://avalon.dragonflybsd.org/iso-images/dfly-x86_64-5.0.2_REL.iso",
+	    "iso_checksum": "717cb73f87a85396bbb1aa55e30048a6",
+	    "iso_checksum_type": "md5",
+	    "boot_wait": "7s",
+	    "boot_command": [
+		"1<wait10><wait10><wait10><wait10><wait10><wait10><wait10><wait10><wait10>",
+		"root<enter><wait5>",
+		"/sbin/dhclient em0<enter><wait10>",
+		"/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/dfly502_ufs_legacy.sh<enter><wait10>",
+		"/bin/sh /tmp/install && /sbin/shutdown -r now<enter>"
+	    ],
+	    "vm_name": "dragonfly502",
+	    "shutdown_command": "/sbin/poweroff",
+	    "ssh_username": "vagrant",
+	    "ssh_password": "vagrant",
+	    "guest_additions_mode": "disable",
+	    "ssh_wait_timeout": "1800s",
+	    "hard_drive_interface": "sata",
+	    "disk_size": 10000
+	}
+    ],
+    "provisioners": [
+	{
+	    "type": "shell",
+	    "scripts": [
+		"scripts/cleanup.sh",
+		"scripts/vagrant_keys.sh"
+	    ]
+	}
+    ],
+    "post-processors": [
+        {
+	    "type": "vagrant"
+        }
+    ]
+}
