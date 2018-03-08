@@ -1,3 +1,4 @@
+vars_cloudtoken.json
 packer_cache
 Vagrantfile
 *.box
