@@ -6,6 +6,15 @@ Our intention is to have one box per release supported (minor releases included 
 
 Please bear in mind that this repo contains scripts and templates specific to our build infrastructure and that may not be suitable for your own case, although in anycase **pull requests are welcome** :-)
 
+We will build boxes for the following providers:
+
+- libvirt
+- Virtualbox (built-in in Vagrant)
+- VMWare (the vagrant-vmware plugin requires a license but you can use [mech](https://github.com/mechboxes/mech))
+- Hyper-V (some caveats)
+
+At this moment DragonFly BSD does not have support for any virtualization technology with acceleration so you'll have to run the DragonFly BSD boxes in another OS like Linux Windows or MacOS.
+
 # References
 
 This templates are loosely in the work from other people:
