@@ -107,8 +107,16 @@
 	}
     ],
     "post-processors": [
-        {
-	    "type": "vagrant"
-        }
+	[
+            {
+		"type": "vagrant"
+            },
+	    {
+		"type": "vagrant-cloud",
+		"box_tag": "dragonflybsd/dragonfly502",
+		"access_token": "{{user `cloud_token`}}",
+		"version": "0.0.1"
+	    }
+	]
     ]
 }
