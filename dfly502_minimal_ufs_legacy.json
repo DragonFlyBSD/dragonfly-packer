@@ -75,7 +75,6 @@
 	{
 	    "type": "vmware-iso",
 	    "guest_os_type": "freebsd-64",
-	    "vm_name": "dfly502",
 	    "headless": "true",
 	    "http_directory": "http",
 	    "iso_url": "http://avalon.dragonflybsd.org/iso-images/dfly-x86_64-5.0.2_REL.iso",
