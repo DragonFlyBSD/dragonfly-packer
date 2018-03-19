@@ -12,6 +12,7 @@
 
 # Use the first disk in kern.disks
 #
+version=$1
 ndisks=$(sysctl -n kern.disks | wc -w | tr -d ' ')
 n=1
 
@@ -97,7 +98,7 @@ proc			/proc		procfs	rw		0	0
 EOF
 
 cat >/mnt/etc/rc.conf <<EOF
-hostname="dragonfly502"
+hostname="dragonfly${version}"
 ifconfig_${interface}="DHCP"
 sshd_enable="YES"
 dntpd_enable="YES"
