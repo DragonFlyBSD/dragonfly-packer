@@ -9,6 +9,7 @@
 # WARNING!  THIS SCRIPT WILL COMPLETELY WIPE THE DISK!
 #
 # $DragonFly: src/share/examples/rconfig/auto.sh,v 1.2 2008/09/03 02:22:25 dillon Exp $
+#set -x
 
 # Use the first disk in kern.disks
 #
@@ -131,8 +132,22 @@ chown 1001 /mnt/vagrant
 #
 cp /etc/resolv.conf /mnt/etc
 
-pkg -c /mnt update
-pkg -c /mnt install -y sudo bash rsync
+#
+# There is a bug in pkgng 1.10.1 in which -c <chroot dir> won't work properly.
+# Detect if the LiveCD has that version or lower and use a pkg-static from
+# bootstrap tools
+PKGVER=$(pkg -v | tr -d .)
+if [ ${PKGVER} -le 1101 ]; then
+    fetch -o /tmp/pkg-static https://monster.dragonflybsd.org/builds/bootstrap/pkg/pkg-static
+    chmod +x /tmp/pkg-static
+    PKGBIN=/tmp/pkg-static
+else
+    PKGBIN=/usr/local/sbin/pkg
+fi
+
+${PKGBIN} -c /mnt update
+${PKGBIN} -c /mnt upgrade -y pkg
+${PKGBIN} -c /mnt install -y sudo bash rsync
 
 # Configure sudoers
 #
