@@ -1,0 +1,14 @@
+{
+	"url": "https://monster.dragonflybsd.org/builds/isos/dfly-x86_64-4.8.1_REL.iso",
+	"hash": "e24ff40437951f6a739540de9976ebed",
+	"hash_type": "md5",
+	"vmname": "dragonfly481",
+	"dfly_version": "481",
+	"box_tag": "dragonflybsd/dragonfly481",
+	"headless": "true",
+	"username": "vagrant",
+	"password": "vagrant",
+	"timeout": "1800s",
+	"disksize": "10000",
+	"box_version": "0.0.1"
+}
