@@ -177,9 +177,9 @@ else
     PKGBIN=/usr/local/sbin/pkg
 fi
 
-${PKGBIN} -c /mnt update
-${PKGBIN} -c /mnt upgrade -y pkg
-${PKGBIN} -c /mnt install -y sudo bash rsync
+chroot /mnt ${PKGBIN} update
+chroot /mnt ${PKGBIN} upgrade -y pkg
+chroot /mnt ${PKGBIN} install -y sudo bash rsync
 
 # Configure sudoers
 #
