@@ -9,7 +9,8 @@ build {
   provisioner "shell" {
     scripts = [
       "scripts/cleanup.sh",
-      "scripts/vagrant_keys.sh"
+      "scripts/vagrant_keys.sh",
+      "scripts/secure_sshd_config.sh"
     ]
   }
 

@@ -156,9 +156,7 @@ chown 1001:1001 /mnt/home/vagrant
 
 # Allow password authentication for ssh connections
 #
-sed -e 's/PasswordAuthentication no/PasswordAuthentication yes/' < \
-    /mnt/etc/ssh/sshd_config > /mnt/etc/ssh/sshd_config.new
-mv -f /mnt/etc/ssh/sshd_config.new /mnt/etc/ssh/sshd_config
+sed -I -e 's/PasswordAuthentication no/PasswordAuthentication yes/' /mnt/etc/ssh/sshd_config
 
 # Install software required
 #
