@@ -54,8 +54,8 @@ variable "ssh_timeout" {
 }
 
 variable "login_prompt_time" {
-  type        = number
-  default     = 50
+  type        = string
+  default     = ""
   description = "Number of seconds until the login: prompt appears"
 }
 
