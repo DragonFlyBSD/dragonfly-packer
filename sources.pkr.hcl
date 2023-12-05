@@ -1,14 +1,22 @@
+local "iso_mirror" {
+  expression = "${var.iso_mirror != "" ? var.iso_name : lookup(var.iso_mirrors, var.iso_mirror_location, "")}"
+}
+
 local "iso_name" {
   expression = "${var.iso_name != "" ? var.iso_name : join("", ["dfly-x86_64-", var.dfly_version, "_REL.iso"])}"
 }
 
 local "iso_url" {
-  expression = "${var.iso_url != "" ? var.iso_url : join("", [var.iso_mirror, local.iso_name])}"
+  expression = "${var.iso_url != "" ? var.iso_url : join("", [local.iso_mirror, local.iso_name])}"
+}
+
+local "iso_checksum" {
+  expression = "${var.iso_checksum != "" ? var.iso_checksum : lookup(var.iso_checksums, local.iso_name, "")}"
 }
 
 source "virtualbox-iso" "dfly" {
   iso_url       = "${local.iso_url}"
-  iso_checksum  = "${var.iso_checksum}"
+  iso_checksum  = "${local.iso_checksum}"
   guest_os_type = "FreeBSD_64"
   headless      = "${var.headless}"
   disk_size     = "${var.disk_size}"
