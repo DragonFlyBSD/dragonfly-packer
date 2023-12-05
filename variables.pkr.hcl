@@ -53,6 +53,12 @@ variable "ssh_timeout" {
   default = "30m"
 }
 
+variable "login_prompt_time" {
+  type        = number
+  default     = 50
+  description = "Number of seconds until the login: prompt appears"
+}
+
 variable "install_script" {
   type = string
 }
