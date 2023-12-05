@@ -61,3 +61,51 @@ source "qemu" "dfly" {
   net_device       = "virtio-net"
   disk_interface   = "virtio"
 }
+
+# variable "cloud_token" {
+#  type    = string
+#  default = "${env("ATLAS_TOKEN")}"
+#}
+
+source "hyperv-iso" "dfly" {
+  iso_url      = "${local.iso_url}"
+  iso_checksum = "${local.iso_checksum}"
+  disk_size    = "${var.disk_size}"
+  boot_wait    = "7s"
+  boot_command = [
+    "1<wait50s>",
+    "root<enter><wait5s>",
+    "/sbin/dhclient vtnet0<enter><wait10s>",
+    "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
+    "/bin/sh /tmp/install ${replace(var.dfly_version, ".", "")} && /sbin/shutdown -r now<enter>"
+  ]
+  http_directory   = "http"
+  shutdown_command = "/sbin/poweroff"
+  network_legacy   = true
+  ssh_username     = "${var.ssh_username}"
+  ssh_password     = "${var.ssh_password}"
+  ssh_timeout      = "${var.ssh_timeout}"
+  vm_name          = "dfly-${var.dfly_version}"
+}
+
+source "vmware-iso" "dfly" {
+  iso_url       = "${local.iso_url}"
+  iso_checksum  = "${local.iso_checksum}"
+  guest_os_type = "freebsd-64"
+  headless      = "${var.headless}"
+  disk_size     = "${var.disk_size}"
+  boot_wait     = "7s"
+  boot_command = [
+    "1<wait50s>",
+    "root<enter><wait5s>",
+    "/sbin/dhclient em0<enter><wait10s>",
+    "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
+    "/bin/sh /tmp/install ${replace(var.dfly_version, ".", "")} && /sbin/shutdown -r now<enter>"
+  ]
+  http_directory   = "http"
+  shutdown_command = "/sbin/poweroff"
+  ssh_password     = "${var.ssh_password}"
+  ssh_username     = "${var.ssh_username}"
+  ssh_wait_timeout = "${var.ssh_timeout}"
+  vm_name          = "dfly-${var.fly_version}"
+}
