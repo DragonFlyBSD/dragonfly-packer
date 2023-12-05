@@ -142,6 +142,9 @@ autoboot_delay="1"
 vfs.root.mountfrom="hammer:${xdisk}d"
 EOF
 
+# pkg requires /dev/null
+mount_null /dev /mnt/dev
+
 # Create 'vagrant' user
 #
 echo 'vagrant' | pw -V /mnt/etc useradd -n vagrant -h 0 -s /bin/sh -G wheel,operator \
@@ -149,39 +152,33 @@ echo 'vagrant' | pw -V /mnt/etc useradd -n vagrant -h 0 -s /bin/sh -G wheel,oper
 mkdir -p /mnt/home/vagrant
 chown 1001:1001 /mnt/home/vagrant
 
+/usr/sbin/pwd_mkdb -d /mnt/etc /mnt/etc/master.passwd
+
 # Allow password authentication for ssh connections
 #
 sed -e 's/PasswordAuthentication no/PasswordAuthentication yes/' < \
     /mnt/etc/ssh/sshd_config > /mnt/etc/ssh/sshd_config.new
 mv -f /mnt/etc/ssh/sshd_config.new /mnt/etc/ssh/sshd_config
 
-# Create /vagrant
-#
-mkdir /mnt/vagrant
-chown 1001 /mnt/vagrant
-
 # Install software required
 #
 cp /etc/resolv.conf /mnt/etc
 
-#
-# There is a bug in pkgng 1.10.1 in which -c <chroot dir> won't work properly.
-# Detect if the LiveCD has that version or lower and use a pkg-static from
-# bootstrap tools
-PKGVER=$(pkg -v | tr -d .)
-if [ ${PKGVER} -le 1101 ]; then
-    fetch -o /tmp/pkg-static https://monster.dragonflybsd.org/builds/bootstrap/pkg/pkg-static
-    chmod +x /tmp/pkg-static
-    PKGBIN=/tmp/pkg-static
-else
-    PKGBIN=/usr/local/sbin/pkg
-fi
+PKGBIN=/usr/local/sbin/pkg
 
 chroot /mnt ${PKGBIN} update
 chroot /mnt ${PKGBIN} upgrade -y pkg
+
+# Fix "pkg: Failed to execute lua script".
+# See: https://lists.dragonflybsd.org/pipermail/users/2021-January/381508.html
+cp /usr/local/etc/pkg/repos/df-latest.conf.sample /mnt/usr/local/etc/pkg/repos/df-latest.conf
+
+chroot /mnt ${PKGBIN} upgrade -yf
+
 chroot /mnt ${PKGBIN} install -y sudo bash rsync
 
 # Configure sudoers
 #
+mkdir -p /mnt/usr/local/etc/sudoers.d
 echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /mnt/usr/local/etc/sudoers.d/wheel
 chmod 440 /mnt/usr/local/etc/sudoers.d/wheel

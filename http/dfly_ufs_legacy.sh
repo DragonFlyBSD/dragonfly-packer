@@ -152,4 +152,5 @@ chroot /mnt ${PKGBIN} install -y sudo bash rsync
 # Configure sudoers
 #
 echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /mnt/usr/local/etc/sudoers.d/wheel
+mkdir -p /mnt/usr/local/etc/sudoers.d
 chmod 440 /mnt/usr/local/etc/sudoers.d/wheel
