@@ -1,6 +1,7 @@
 build {
   sources = [
-    "source.virtualbox-iso.dfly"
+    "source.virtualbox-iso.dfly",
+    "source.qemu.dfly"
   ]
 
   provisioner "shell" {

@@ -23,7 +23,7 @@ source "virtualbox-iso" "dfly" {
   boot_wait     = "5s"
   boot_command = [
     "1<wait30s>",
-    "root<return><wait5s>",
+    "root<enter><wait5s>",
     "/sbin/dhclient em0<enter><wait10s>",
     "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
     "/bin/sh /tmp/install ${replace(var.dfly_version, ".", "")} && /sbin/shutdown -r now<enter>"
@@ -36,4 +36,28 @@ source "virtualbox-iso" "dfly" {
   vm_name              = "dfly-${var.dfly_version}"
   hard_drive_interface = "sata"
   guest_additions_mode = "disable"
+}
+
+source "qemu" "dfly" {
+  iso_url      = "${local.iso_url}"
+  iso_checksum = "${local.iso_checksum}"
+  format       = "qcow2"
+  headless     = "${var.headless}"
+  disk_size    = "${var.disk_size}"
+  boot_wait    = "3s"
+  boot_command = [
+    "1<wait50s>",
+    "root<enter><wait5s>",
+    "/sbin/dhclient vtnet0<enter><wait10s>",
+    "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
+    "/bin/sh /tmp/install ${replace(var.dfly_version, ".", "")} && /sbin/shutdown -r now<enter>"
+  ]
+  http_directory   = "http"
+  shutdown_command = "/sbin/poweroff"
+  ssh_username     = "${var.ssh_username}"
+  ssh_password     = "${var.ssh_password}"
+  ssh_timeout      = "${var.ssh_timeout}"
+  vm_name          = "dfly-${var.dfly_version}"
+  net_device       = "virtio-net"
+  disk_interface   = "virtio"
 }
