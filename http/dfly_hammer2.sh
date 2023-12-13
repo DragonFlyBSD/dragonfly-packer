@@ -98,11 +98,11 @@
     local _disk=$1
     local _mnt=$2
 
-    _disk=`find_serno_for_disk $_disk`
+    local _part_root=`map_partition_to_serno ${_disk}s3`
 
     cat > $_mnt/boot/loader.conf << _EOF_
 autoboot_delay="1"
-vfs.root.mountfrom="hammer2:/dev/${_disk}s3@ROOT"
+vfs.root.mountfrom="hammer2:/dev/${_part_root}@ROOT"
 _EOF_
 
     mkdir -p $_mnt/boot/efi/EFI/BOOT
@@ -116,17 +116,19 @@ _EOF_
 06_config_fstab() {
     local _disk=$1
     local _mnt=$2
-
-    _disk=`find_serno_for_disk $_disk`
+    local _part_root=`map_partition_to_serno ${_disk}s3`
+    local _part_boot=`map_partition_to_serno ${_disk}s1`
+    local _part_efi=`map_partition_to_serno ${_disk}s0`
+    local _part_swap=`map_partition_to_serno ${_disk}s2`
 
     cat > $_mnt/etc/fstab << _EOF_
 # Device			    Mountpoint  FStype	Options		Dump	Pass#
-/dev/${_disk}s3@ROOT	/		    hammer2	rw		1	1
-/dev/${_disk}s3@HOME	/home		hammer2	rw		2	2
-/dev/${_disk}s3@BUILD	/build		hammer2	rw		2	2
-/dev/${_disk}s1			/boot		ufs     rw		2	2
-/dev/${_disk}s0			/boot/efi	msdos	rw,noauto	2	2
-/dev/${_disk}s2			none		swap	sw		0	0
+/dev/${_part_root}@ROOT	/		    hammer2	rw		1	1
+/dev/${_part_root}@HOME	/home		hammer2	rw		2	2
+/dev/${_part_root}@BUILD	/build		hammer2	rw		2	2
+/dev/${_part_boot}			/boot		ufs     rw		2	2
+/dev/${_part_efi}			/boot/efi	msdos	rw,noauto	2	2
+/dev/${_part_swap}			none		swap	sw		0	0
 /build/usr.obj			/usr/obj	null	rw		0	0
 /build/var.cache		/var/cache	null	rw		0	0
 /build/var.crash		/var/crash	null	rw		0	0
@@ -141,10 +143,10 @@ _EOF_
     local _mnt=$2
     local _hostname=$3
 
-    _disk=`find_serno_for_disk $_disk`
+    local _part_swap=`map_partition_to_serno ${_disk}s2`
 
     cat >> $_mnt/etc/rc.conf << _EOF_
-dumpdev="/dev/${_disk}s2"
+dumpdev="/dev/${_part_swap}"
 hostname="${_hostname}"
 tmpfs_tmp="YES"
 tmpfs_var_run="YES"
@@ -178,10 +180,19 @@ _EOF_
     chroot $_mnt pw usermod $_user -s ${_shell}
 }
 
-find_serno_for_disk() {
-    local _disk=$1
-    # TODO
-    echo $_disk
+map_partition_to_serno() {
+    local _part=$1
+    local _serno
+
+    for _serno in `find /dev/serno -type c`; do
+        if [ `stat -f %Z /dev/${_part}` == `stat -f %Z ${_serno}` ]; then
+            # same device
+            echo $_serno | cut -d / -f 3-
+            return
+        fi
+    done
+
+    echo ${_part}
 }
 
 do_install() {
