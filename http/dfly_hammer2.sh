@@ -3,6 +3,7 @@
 # Install a DragonFly system from livecd.
 #
 # Mostly taken from:
+#
 # https://gist.github.com/liweitianux/547652a3dd3a853afed71ba50410ffb5
 #
 
@@ -24,7 +25,6 @@
     newfs -n BOOT            /dev/${_disk}s1         # UFS /boot
     newfs_hammer2 -L ROOT    /dev/${_disk}s3         # HAMMER2 /
 }
-
 03_mount_and_init_fs() {
     local _disk=$1
     local _mnt=$2
@@ -67,7 +67,7 @@
     local _mnt=$1
 
     mtree -deU -f /etc/mtree/BSD.root.dist    -p $_mnt
-    mtree -deU -f /etc/mtree/BSD.var.dist     -p $_mnt/var
+    mtree -deiU -f /etc/mtree/BSD.var.dist    -p $_mnt/var
     mtree -deU -f /etc/mtree/BSD.usr.dist     -p $_mnt/usr
     mtree -deU -f /etc/mtree/BSD.include.dist -p $_mnt/usr/include
 }
@@ -76,13 +76,22 @@
     local _mnt=$1
 
     cpdup -vI /        $_mnt
+    cpdup -vI /root    $_mnt/root
     cpdup -vI /boot    $_mnt/boot
+    cpdup -vI /var     $_mnt/var
     cpdup -vI /var/log $_mnt/var/log
+    cpdup -vI /usr/local/etc $_mnt/usr/local/etc
 
     cd $_mnt
     rm -rf README* autorun* dflybsd.ico index.html
-    rm -rf etc
+    rm -rf etc # should not be neccessary!
     mv etc.hdd etc
+}
+
+05_copy_system_post() {
+    local _mnt=$1
+    #(cd $_mnt && ln -s usr/src/sys sys)
+    (cd $_mnt/etc/ssl && ln -s ../../usr/local/share/certs/ca-root-nss.crt cert.pem)
 }
 
 06_config_boot() {
@@ -141,6 +150,7 @@ tmpfs_tmp="YES"
 tmpfs_var_run="YES"
 dhcpcd_enable="YES"
 sshd_enable="YES"
+sshd_flags="-o PermitRootLogin=yes -o PasswordAuthentication=yes" # REMOVE-ME-AFTER-INSTALL
 dntpd_enable="YES"
 powerd_enable="YES"
 _EOF_
@@ -152,11 +162,20 @@ _EOF_
     pw -V $_mnt/etc userdel installer
 }
 
-07_set_password_stdin() {
+07_change_password() {
     local _mnt=$1
     local _user=$2
+    local _password=$3
 
-    chroot $_mnt pw usermod $_user -h 0
+    echo "${_password}" | chroot $_mnt pw usermod $_user -h 0
+}
+
+07_change_shell() {
+    local _mnt=$1
+    local _user=$2
+    local _shell=$3
+
+    chroot $_mnt pw usermod $_user -s ${_shell}
 }
 
 find_serno_for_disk() {
@@ -165,7 +184,7 @@ find_serno_for_disk() {
     echo $_disk
 }
 
-main() {
+do_install() {
     local _disk=$1
     local _mnt=$2
 
@@ -176,12 +195,36 @@ main() {
     03_mount_and_init_fs $_disk $_mnt
     04_create_fs_layout $_mnt
     05_copy_system  $_mnt
+    05_copy_system_post  $_mnt
     06_config_boot  $_disk $_mnt
     06_config_fstab $_disk $_mnt
     06_config_rc_conf $_disk $_mnt dragonfly
     06_config_userdb $_mnt
-    echo "toor" | 07_set_password_stdin $_mnt root
+    07_change_password $_mnt root toor
+    # /bin/sh is somehow required as root-shell, otherwise packer fails to execute `chmod` (maybe wrong path?)
+    # XXX: it was failing because /root was missing!
+    07_change_shell $_mnt root /bin/sh
 }
 
-_disk=$1
-main $_disk /tmp/rootmnt
+do_reboot() {
+    # NOTE: Ejecting livecd via camcontrol eject cd0 does not work. it hangs during shutdown
+    kldload efirt # efibootmgr needs this!
+    # Boot order is CD, HD so make HD the nextBoot (permanent?)
+    efibootmgr -b 0002 -n
+    shutdown -r now
+}
+
+_cmd=$1
+case "${_cmd}" in
+install)
+    _disk=$2
+    do_install $_disk /tmp/rootmnt
+    ;;
+reboot)
+    do_reboot
+    ;;
+*)
+    echo "Unknown command: ${_cmd}"
+    exit 1
+    ;;
+esac

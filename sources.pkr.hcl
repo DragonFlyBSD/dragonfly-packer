@@ -26,8 +26,9 @@ source "virtualbox-iso" "dfly" {
     "root<enter><wait5s>",
     "/sbin/dhclient em0<enter><wait10s>",
     "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
-    "/bin/sh /tmp/install da0 && /sbin/shutdown -r now<enter>"
+    "/bin/sh /tmp/install install da0 && /bin/sh /tmp/install reboot<enter>"
   ]
+  firmware             = "efi"
   http_directory       = "http"
   shutdown_command     = "/sbin/poweroff"
   ssh_username         = "${var.ssh_username}"

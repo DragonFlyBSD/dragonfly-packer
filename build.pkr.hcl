@@ -8,9 +8,11 @@ build {
 
   provisioner "shell" {
     scripts = [
-      "scripts/cleanup.sh",
-      "scripts/vagrant_keys.sh",
-      "scripts/secure_sshd_config.sh"
+      "scripts/01_secure_sshd_config.sh",
+      "scripts/02_upgrade_packages.sh",
+      "scripts/03_setup_sudo.sh",
+      "scripts/04_create_vagrant_user.sh",
+      "scripts/05_install_additional_packages.sh"
     ]
   }
 
