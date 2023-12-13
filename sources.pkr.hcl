@@ -26,7 +26,7 @@ source "virtualbox-iso" "dfly" {
     "root<enter><wait5s>",
     "/sbin/dhclient em0<enter><wait10s>",
     "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
-    "/bin/sh /tmp/install ${replace(var.dfly_version, ".", "")} && /sbin/shutdown -r now<enter>"
+    "/bin/sh /tmp/install da0 && /sbin/shutdown -r now<enter>"
   ]
   http_directory       = "http"
   shutdown_command     = "/sbin/poweroff"
@@ -77,7 +77,7 @@ source "hyperv-iso" "dfly" {
     "root<enter><wait5s>",
     "/sbin/dhclient de0<enter><wait10s>",
     "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
-    "/bin/sh /tmp/install ${replace(var.dfly_version, ".", "")} && /sbin/shutdown -r now<enter>"
+    "/bin/sh /tmp/install ad0 && /sbin/shutdown -r now<enter>"
   ]
   http_directory   = "http"
   shutdown_command = "/sbin/poweroff"
