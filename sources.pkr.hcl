@@ -22,7 +22,7 @@ source "virtualbox-iso" "dfly" {
   disk_size     = "${var.disk_size}"
   boot_wait     = "5s"
   boot_command = [
-    "1<wait${var.login_prompt_time != "" ? var.login_prompt_time : "30s"}>",
+    "1<wait${var.login_prompt_time != "" ? var.login_prompt_time : "50s"}>",
     "root<enter><wait5s>",
     "/sbin/dhclient em0<enter><wait10s>",
     "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
@@ -69,11 +69,6 @@ source "qemu" "dfly" {
   efi_firmware_code = "/usr/local/share/OVMF/OVMF_CODE-pure-efi.fd"
   efi_firmware_vars = "/usr/local/share/OVMF/OVMF_VARS-pure-efi.fd"
 }
-
-# variable "cloud_token" {
-#  type    = string
-#  default = "${env("ATLAS_TOKEN")}"
-#}
 
 source "hyperv-iso" "dfly" {
   iso_url      = "${local.iso_url}"

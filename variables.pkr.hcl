@@ -62,3 +62,10 @@ variable "login_prompt_time" {
 variable "install_script" {
   type = string
 }
+
+# variable "vagrant_cloud_token" {
+#  type    = string
+#  default = "${env("ATLAS_TOKEN")}"
+#}
+
+

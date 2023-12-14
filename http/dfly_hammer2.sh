@@ -25,6 +25,7 @@
     newfs -n BOOT            /dev/${_disk}s1         # UFS /boot
     newfs_hammer2 -L ROOT    /dev/${_disk}s3         # HAMMER2 /
 }
+
 03_mount_and_init_fs() {
     local _disk=$1
     local _mnt=$2
@@ -75,6 +76,7 @@
 05_copy_system() {
     local _mnt=$1
 
+    # On the livecd, each of the following are separate mount points:
     cpdup -vI /        $_mnt
     cpdup -vI /root    $_mnt/root
     cpdup -vI /boot    $_mnt/boot

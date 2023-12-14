@@ -16,15 +16,15 @@ build {
     ]
   }
 
-  /*
   post-processors {
-   post-processor "vagrant" {
-   }
+    post-processor "vagrant" {
+    }
+    /*
    post-processor "vagrant-cloud" {
-     access_token = "${var.cloud_token}"
+     access_token = "${var.vagrant_cloud_token}"
      box_tag      = "${var.box_tag}"
      version      = "${var.box_version}"
    }
+   */
   }
-  */
 }
