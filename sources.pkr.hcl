@@ -26,7 +26,7 @@ source "virtualbox-iso" "dfly" {
     "root<enter><wait5s>",
     "/sbin/dhclient em0<enter><wait10s>",
     "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
-    "/bin/sh /tmp/install install da0 && /bin/sh /tmp/install reboot<enter>"
+    "/bin/sh /tmp/install install da0 && /bin/sh /tmp/install reboot 0002<enter>"
   ]
   firmware             = "efi"
   http_directory       = "http"
@@ -47,11 +47,11 @@ source "qemu" "dfly" {
   disk_size    = "${var.disk_size}"
   boot_wait    = "3s"
   boot_command = [
-    "1<wait${var.login_prompt_time != "" ? var.login_prompt_time : "50s"}>",
+    "1<wait${var.login_prompt_time != "" ? var.login_prompt_time : "70s"}>",
     "root<enter><wait5s>",
     "/sbin/dhclient vtnet0<enter><wait10s>",
     "/usr/bin/fetch -o /tmp/install http://{{ .HTTPIP }}:{{ .HTTPPort }}/${var.install_script}<enter><wait1s>",
-    "/bin/sh /tmp/install ${replace(var.dfly_version, ".", "")} && /sbin/shutdown -r now<enter>"
+    "/bin/sh /tmp/install install vbd0 && /bin/sh /tmp/install reboot 0003<enter>"
   ]
   http_directory   = "http"
   shutdown_command = "/sbin/poweroff"
@@ -61,6 +61,13 @@ source "qemu" "dfly" {
   vm_name          = "dfly-${var.dfly_version}"
   net_device       = "virtio-net"
   disk_interface   = "virtio"
+
+  # Download from here:
+  # https://www.kraxel.org/repos/jenkins/edk2/
+  # Or read: https://wiki.freebsd.org/UEFI
+  efi_boot          = true
+  efi_firmware_code = "/usr/local/share/OVMF/OVMF_CODE-pure-efi.fd"
+  efi_firmware_vars = "/usr/local/share/OVMF/OVMF_VARS-pure-efi.fd"
 }
 
 # variable "cloud_token" {

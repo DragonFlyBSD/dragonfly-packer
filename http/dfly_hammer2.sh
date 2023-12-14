@@ -213,15 +213,16 @@ do_install() {
     06_config_userdb $_mnt
     07_change_password $_mnt root toor
     # /bin/sh is somehow required as root-shell, otherwise packer fails to execute `chmod` (maybe wrong path?)
-    # XXX: it was failing because /root was missing!
     07_change_shell $_mnt root /bin/sh
 }
 
 do_reboot() {
+    local _nextboot=$1
+
     # NOTE: Ejecting livecd via camcontrol eject cd0 does not work. it hangs during shutdown
     kldload efirt # efibootmgr needs this!
     # Boot order is CD, HD so make HD the nextBoot (permanent?)
-    efibootmgr -b 0002 -n
+    efibootmgr -b $_nextboot -n
     shutdown -r now
 }
 
@@ -232,7 +233,8 @@ install)
     do_install $_disk /tmp/rootmnt
     ;;
 reboot)
-    do_reboot
+    _nextboot=$2
+    do_reboot $_nextboot
     ;;
 *)
     echo "Unknown command: ${_cmd}"
