@@ -13,7 +13,7 @@
     dd if=/dev/zero of=/dev/$_disk bs=32k count=16
     gpt create -f $_disk
     gpt add -t efi     -s  262144 $_disk  # ESP (128 MB)
-    gpt add -t ufs     -s 4194303 $_disk  # UFS /boot (2 GB)
+    gpt add -t ufs     -s 2097152 $_disk  # UFS /boot (1 GB)
     gpt add -t swap    -s 2097152 $_disk  # swap (1 GB)
     gpt add -t hammer2            $_disk  # HAMMER2 (all remainaing space)
 }
